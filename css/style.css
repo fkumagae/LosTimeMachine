@@ -91,3 +91,20 @@ legend { margin-bottom: 10px; padding: 0; font-weight: 700; }
   .hero { grid-template-columns: 1.2fr 1fr; }
   .hero-art { display: flex; }
 }
+
+.member-form { max-width: 520px; display: grid; gap: 12px; margin-block: 14px; }
+.member-form[hidden] { display: none; }
+.member-form .button { justify-self: start; }
+.member-form [role="status"]:empty, .member-session [role="status"]:empty { display: none; }
+.field textarea {
+  font: inherit;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #211329;
+  color: #fff7f5;
+  padding: 10px 12px;
+  resize: vertical;
+}
+.member-bio { margin-block: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.member-session { margin-top: 18px; }

@@ -43,17 +43,30 @@ function home() {
   </div></section>`;
 }
 
-function participants() {
-  main.innerHTML = heading('Participantes', 'Encontre um integrante pelo nome ou apelido.', true) +
+function participants(people = demo.participants, isDemo = true) {
+  main.innerHTML = heading('Participantes', 'Encontre um integrante pelo nome ou apelido.', isDemo) +
     '<label class="field">Buscar participante<input type="search" placeholder="Ex.: Tico"></label><div id="people" class="grid" aria-live="polite"></div>';
   const search = main.querySelector('input');
   const list = main.querySelector('#people');
   function filter() {
     const query = normalize(search.value);
-    list.innerHTML = demo.participants.filter(person =>
+    const matches = people.filter(person =>
       [person.nome, person.apelido].some(value => normalize(value).includes(query))
-    ).map(person => `<a class="card person" href="perfil.html?id=${person.id}">${picture(asset(person.id), 'Retrato ilustrativo de ' + person.apelido)}<div><h2>${person.apelido}</h2><p>${person.nome}</p></div></a>`).join('') ||
-      '<p class="empty">Nenhum participante encontrado.</p>';
+    );
+    if (!matches.length) {
+      list.innerHTML = '<p class="empty">Nenhum participante encontrado.</p>';
+      return;
+    }
+    list.replaceChildren(...matches.map(person => {
+      const link = document.createElement('a');
+      link.className = 'card person';
+      link.href = 'perfil.html?id=' + encodeURIComponent(person.id);
+      link.innerHTML = picture(isDemo ? asset(person.id) : '', 'Retrato ilustrativo de ' + person.apelido)
+        + '<div><h2></h2><p></p></div>';
+      link.querySelector('h2').textContent = person.apelido;
+      link.querySelector('p').textContent = person.nome;
+      return link;
+    }));
     watchImages();
   }
   search.addEventListener('input', filter);
@@ -141,5 +154,5 @@ function admin() {
     ].map(([title, description]) => `<section class="card panel"><h2>${title}</h2><p>${description}</p><button class="button" disabled>Em breve</button></section>`).join('') + '</div>';
 }
 
-({ index: home, participantes: participants, perfil: profile, galeria: gallery, historico: historyPage, votacao: voting, admin })[page]?.();
+({ index: home, galeria: gallery, historico: historyPage, votacao: voting, admin })[page]?.();
 watchImages();

@@ -10,9 +10,13 @@ O endereço é fixo e acompanha a branch `main` após a ativação do GitHub Pag
 
 ## Executar localmente
 
-1. Extraia o ZIP e abra a pasta `losawards` no VS Code.
+1. Abra a pasta do repositório no VS Code.
 2. No terminal dessa pasta, execute `python -m http.server 8000`. No Windows, se necessário, use `py -m http.server 8000`. Em macOS ou Linux, use `python3 -m http.server 8000`.
 3. Abra [http://localhost:8000](http://localhost:8000).
+
+## Etapa 2 — contas e perfis colaborativos
+
+Veja [Configuração e teste do Supabase](docs/SUPABASE.md) para preparar as migrações, a autenticação por convite e o teste com dois integrantes. A configuração padrão continua em modo DEMO.
 
 ## Roteiro de revisão
 
