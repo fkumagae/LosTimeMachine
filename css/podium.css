@@ -1,0 +1,20 @@
+.stage { padding: clamp(12px, 3vw, 30px); text-align: center; background: linear-gradient(145deg,#4c2a63,#662c52 65%,#773b39); }
+.stage h2 { margin-block: 5px 20px; font-size: clamp(1.5rem, 4vw, 2.8rem); }
+.progress, .keyboard { font-size: .85rem; color: var(--gold); }
+.podium { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); align-items: end; gap: clamp(5px, 1.6vw, 18px); max-width: 790px; margin-inline: auto; }
+.spot { --medal: #ead2eb; min-width: 0; }
+.pos-1 { --medal: #ffe199; }
+.pos-3 { --medal: #ffb7a3; }
+.spot-content { display: grid; gap: 5px; min-height: 86px; align-content: end; overflow-wrap: anywhere; }
+.spot-content small { padding-bottom: 7px; }
+.locked { min-height: 65px; display: grid; place-items: center; border: 1px dashed var(--line); border-radius: 8px; margin-bottom: 6px; color: var(--muted); font-size: .78rem; }
+.rank { display: grid; place-items: center; background: #26173566; border: 1px solid var(--line); border-radius: 8px; color: var(--medal); font-size: 1.3rem; font-weight: 900; height: 44px; }
+.pos-1 .rank { height: 70px; }
+.pos-2 .rank { height: 55px; }
+.collage { display: flex; aspect-ratio: 4 / 3; overflow: hidden; border: 2px solid var(--medal); border-radius: 8px; }
+.collage .picture { flex: 1; min-width: 0; aspect-ratio: auto; font-size: .68rem; }
+.collage .picture + .picture { border-left: 2px solid #36192e; }
+#reveal-status { margin-block: 12px; min-height: 1.6em; }
+.podium-controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; }
+.podium-controls .button { padding-inline: clamp(7px, 2vw, 15px); font-size: .86rem; }
+.keyboard { margin-top: 9px; }
