@@ -14,15 +14,16 @@ continuam usando seus dados de demonstração.
 2. Em **Authentication → Sign In / Providers**, mantenha **Email** ativo e
    desative **Allow new users to sign up** e o acesso anônimo.
 3. Em **Authentication → URL Configuration**, defina **Site URL** para a URL
-   exata da página de participantes que receberá os cliques do convite.
+   exata da página de participantes que receberá o convite e os links de acesso.
    Mantenha a mesma URL na lista de redirecionamentos permitidos. Para teste
    local no computador, use `http://localhost:8000/pages/participantes.html`.
    Para teste no telefone, use a URL HTTPS de uma prévia separada e autorizada.
    Faça isso antes de enviar os convites.
-4. Em **Authentication → Email Templates**, mantenha **Invite user** com
-   `{{ .ConfirmationURL }}`. Em **Magic Link**, use um código, por exemplo
-   `<p>Seu código de acesso é {{ .Token }}</p>`.
-5. Para endereços fora da equipe do projeto, configure SMTP próprio em
+4. Em **Authentication → Email Templates**, mantenha os modelos padrão de
+   **Invite user** e **Magic link or OTP** para testar com links. Se você
+   configurar SMTP próprio e personalizar o modelo de acesso com
+   `{{ .Token }}`, o formulário também aceita o código.
+5. Para endereços fora da equipe da organização Supabase, configure SMTP próprio em
    **Authentication → Custom SMTP**. As credenciais SMTP ficam no Supabase.
    Para testes locais com Supabase CLI, consulte o capturador de e-mails
    indicado por `supabase status`.
@@ -50,8 +51,9 @@ Referências da configuração
    ```
 
 3. Cada pessoa pode aceitar o convite pelo link. Para entrar novamente,
-   abra **Participantes**, solicite o código com o e-mail convidado e digite
-   o código recebido. Uma conta sem vínculo vê **Acesso pendente**. Para
+   abra **Participantes**, solicite o acesso com o e-mail convidado e abra
+   o link recebido. Se o modelo enviar um código, selecione **Recebi um
+   código**. Uma conta sem vínculo vê **Acesso pendente**. Para
    revogar o acesso aos perfis, remova o vínculo pelo painel administrativo
    do Supabase.
 
@@ -59,9 +61,8 @@ Referências da configuração
 
 Sirva a branch no computador com `python3 -m http.server 8000` ou `py -m http.server 8000`.
 Use perfis separados do navegador ou aparelhos distintos para a matriz abaixo.
-No telefone, aponte para a mesma cópia de teste por HTTPS para validar o clique
-do convite. Se estiver apenas testando o login por código, pode servir a cópia
-na rede local e abrir o endereço IP do computador.
+No telefone, abra a cópia de teste por HTTPS para validar os links do
+convite e do login. Use a URL dessa cópia nas configurações de redirecionamento.
 
 | Teste | Resultado esperado |
 | --- | --- |
