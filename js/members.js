@@ -30,35 +30,43 @@ function showLogin(client, notice = '') {
   sessionPanel('Entrar por convite', 'Use o e-mail que recebeu o convite para o Los Awards.',
     `<form id="send-code" class="card panel member-form">
       <label class="field">E-mail<input name="email" type="email" autocomplete="email" required></label>
-      <button class="button primary" type="submit">Enviar código</button>
+      <button class="button primary" type="submit">Enviar acesso por e-mail</button>
       <p role="status"></p>
     </form>
-    <form id="verify-code" class="card panel member-form" hidden>
-      <label class="field">Código recebido<input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]+" required></label>
-      <button class="button primary" type="submit">Entrar</button>
-      <p role="status"></p>
-    </form>`);
+    <details class="card panel member-form" hidden>
+      <summary>Recebi um código</summary>
+      <form id="verify-code" class="member-form">
+        <label class="field">Código recebido<input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]+" required></label>
+        <button class="button primary" type="submit">Entrar</button>
+        <p role="status"></p>
+      </form>
+    </details>`);
 
   const send = main.querySelector('#send-code');
   const verify = main.querySelector('#verify-code');
+  const codeOption = verify.closest('details');
   let email = '';
   report(send, notice);
 
   handleSubmit(send, async data => {
     email = '';
-    verify.hidden = true;
+    codeOption.hidden = true;
+    codeOption.open = false;
     const requested = data.get('email').trim();
-    const { error } = await client.auth.signInWithOtp({ email: requested, options: { shouldCreateUser: false } });
+    const emailRedirectTo = new URL('participantes.html', location.href).href;
+    const { error } = await client.auth.signInWithOtp({
+      email: requested,
+      options: { shouldCreateUser: false, emailRedirectTo }
+    });
     if (error) {
-      report(send, 'Falha ao solicitar código. Confira o e-mail do convite ou tente novamente em instantes.');
+      report(send, 'Falha ao solicitar o acesso. Confira o e-mail do convite ou tente novamente em instantes.');
       return;
     }
     email = requested;
-    report(send, 'Confira sua caixa de entrada.');
+    report(send, 'Confira sua caixa de entrada e abra o link. Se receber um código, use a opção abaixo.');
     verify.reset();
     report(verify, '');
-    verify.hidden = false;
-    verify.elements.code.focus();
+    codeOption.hidden = false;
   });
 
   handleSubmit(verify, async data => {
@@ -170,7 +178,7 @@ async function start() {
     const { data: { session }, error } = await client.auth.getSession();
     if (error || !session) {
       showLogin(client, callback.has('error') || callback.has('access_token')
-        ? 'O link de convite não pôde ser usado. Confira o convite ou solicite um código.' : '');
+        ? 'O link não pôde ser usado. Confira o convite ou solicite um novo acesso.' : '');
       return;
     }
 
