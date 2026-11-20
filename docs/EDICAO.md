@@ -28,3 +28,9 @@ A propriedade opcional dadinhoPhoto recebe a imagem fornecida futuramente. No vo
 ## Verificação
 
 Execute `node --test tests/*.cjs tests/*.mjs` na raiz. Os testes cobrem o Roster, a correspondência entre o seed de edição e o modo local, troca de voto, empates, contagem por autoria e rankings.
+
+## Retrospectiva na TV e histórico
+
+Em Histórico, escolha a edição e toque em **Apresentar na TV**. Use as setas do teclado ou os botões para passar uma memória por vez, no ritmo da turma. Em navegadores compatíveis, **Tela cheia** expande a apresentação. Ao sair, a página mantém a memória atual. **Abrir cerimônia** leva ao pódio.
+
+Abaixo da retrospectiva, os premiados aparecem por categoria, inclusive fotos, frases sem autor e empates. O ranking individual usa apenas os troféus que têm crédito pessoal.

@@ -129,3 +129,27 @@ legend { margin-bottom: 10px; padding: 0; font-weight: 700; }
 .tv .memory h3 { font-size: clamp(1.4rem, 4vw, 3rem); }
 details > summary { cursor: pointer; padding: .6rem; }
 dialog img { max-width: min(80vw, 30rem); }
+
+dialog.retrospective-tv {
+  position: fixed;
+  inset: 0;
+  margin: 0;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  border: 0;
+  border-radius: 0;
+  background: #1d112b;
+  overflow: auto;
+}
+.tv-frame {
+  min-height: 100%;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  align-items: center;
+}
+.tv-frame .tv { width: min(100%, 72rem); }
+.tv-frame .picture { width: 100%; aspect-ratio: auto; }
+.tv-controls { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: .65rem; }
+.tv-frame:fullscreen { padding: 1rem; overflow: auto; background: #1d112b; }
