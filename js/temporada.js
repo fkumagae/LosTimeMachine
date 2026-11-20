@@ -248,9 +248,112 @@ function complete() {
 function confirmed() {
   return [...state.archive, ...(complete() ? state.results : [])];
 }
+function editionWinners(results) {
+  const categories = results.filter((result) => result.ranked[0]?.length);
+  return (
+    categories
+      .map(
+        (result) =>
+          '<article class="card panel"><h3>' +
+          esc(result.title) +
+          '</h3><ul>' +
+          result.ranked[0]
+            .map(
+              (winner) =>
+                '<li>' +
+                (winner.image ? picture(winner.image, winner.label) : '') +
+                esc(winner.label) +
+                '</li>',
+            )
+            .join('') +
+          '</ul></article>',
+      )
+      .join('') || '<p>Aguardando resultados confirmados.</p>'
+  );
+}
+
+// O mesmo índice serve para a página e para a TV, inclusive ao sair com Escape.
+function presentRetrospective() {
+  const memories = state.memories.filter((memory) => memory.year === year);
+  if (!memories.length) return;
+  const dialog = document.createElement('dialog');
+  dialog.className = 'retrospective-tv';
+  dialog.setAttribute('aria-label', 'Retrospectiva de ' + year);
+  dialog.innerHTML =
+    '<div class="tv-frame"><div class="tv" data-memory></div>' +
+    '<div class="tv-controls"><span role="status"></span>' +
+    button('previous-slide', 'Anterior') +
+    button('next-slide', 'Próxima') +
+    (document.fullscreenEnabled ? button('fullscreen', 'Tela cheia') : '') +
+    button('end-show', 'Sair da apresentação') +
+    '<a class="button primary" href="podio.html">Abrir cerimônia</a></div></div>';
+  // Fora da seção para que os controles da apresentação não acionem o formulário da edição.
+  main.append(dialog);
+  const previous = dialog.querySelector('[data-action="previous-slide"]');
+  const next = dialog.querySelector('[data-action="next-slide"]');
+  const screen = dialog.querySelector('[data-action="fullscreen"]');
+  const status = dialog.querySelector('[role="status"]');
+  function display() {
+    dialog.querySelector('[data-memory]').innerHTML = card(memories[slide]);
+    status.textContent = year + ' · ' + (slide + 1) + ' de ' + memories.length;
+    previous.disabled = slide === 0;
+    next.disabled = slide === memories.length - 1;
+    watchImages();
+  }
+  previous.onclick = () => {
+    if (slide > 0) {
+      slide--;
+      display();
+    }
+  };
+  next.onclick = () => {
+    if (slide < memories.length - 1) {
+      slide++;
+      display();
+    }
+  };
+  dialog.addEventListener('keydown', (event) => {
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
+    if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+    event.preventDefault();
+    (event.key === 'ArrowLeft' ? previous : next).click();
+  });
+  if (screen) {
+    const frame = dialog.querySelector('.tv-frame');
+    screen.onclick = async () => {
+      try {
+        if (document.fullscreenElement === frame)
+          await document.exitFullscreen();
+        else await frame.requestFullscreen();
+      } catch {
+        status.textContent = 'Tela cheia indisponível neste navegador.';
+      }
+    };
+    dialog.addEventListener('fullscreenchange', () => {
+      screen.textContent =
+        document.fullscreenElement === frame
+          ? 'Sair da tela cheia'
+          : 'Tela cheia';
+    });
+  }
+  dialog.querySelector('[data-action="end-show"]').onclick = () =>
+    dialog.close();
+  dialog.addEventListener(
+    'close',
+    () => {
+      dialog.remove();
+      draw();
+      query('[data-action="present"]')?.focus();
+    },
+    { once: true },
+  );
+  display();
+  dialog.showModal();
+}
 function historyView() {
   const memories = state.memories.filter((m) => m.year === year);
   slide = Math.max(0, Math.min(slide, memories.length - 1));
+  const results = confirmed().filter((result) => result.year === year);
   return (
     heading('Retrospectiva', 'Fotos e histórias da edição para passar na TV.') +
     '<label>Edição <select id="year">' +
@@ -268,10 +371,14 @@ function historyView() {
         memories.length +
         '</p>' +
         button('back', 'Anterior') +
-        button('next', 'Próxima')
+        button('next', 'Próxima') +
+        button('present', 'Apresentar na TV')
       : '<p>Nenhuma memória nesta edição.</p>') +
     ' <a class="button primary" href="podio.html">Abrir cerimônia</a><h2>Premiados da edição</h2>' +
-    ranking(confirmed().filter((r) => r.year === year))
+    '<div class="grid">' +
+    editionWinners(results) +
+    '</div><h2>Ranking individual</h2>' +
+    ranking(results)
   );
 }
 function podiumView() {
@@ -459,6 +566,10 @@ async function act(event) {
   control.disabled = true;
   try {
     const action = form?.dataset.form || control.dataset.action;
+    if (action === 'present') {
+      presentRetrospective();
+      return;
+    }
     if (action === 'back' || action === 'next') {
       slide += action === 'next' ? 1 : -1;
       draw();
