@@ -1,4 +1,5 @@
 import { supabaseConfig } from './supabase-config.js';
+import { openTestPage } from './test-ui.js';
 
 const { url, publishableKey } = supabaseConfig;
 const fields = 'id,nome,apelido,bio,updated_at';
@@ -138,7 +139,6 @@ async function openProfile(client) {
     for (const key of ['nome', 'apelido', 'bio']) form.elements[key].value = profile[key];
   }
   display(person);
-
   handleSubmit(form, async data => {
     const updates = Object.fromEntries(['nome', 'apelido', 'bio'].map(key => [key, data.get(key).trim()]));
     if (!updates.nome || !updates.apelido) {
@@ -160,9 +160,8 @@ async function openProfile(client) {
 
 async function start() {
   if (!url && !publishableKey) {
-    if (page === 'perfil') profile();
-    else participants();
-    watchImages();
+    openTestPage();
+    if (page === "perfil") await import("./temporada.js");
     return;
   }
   sessionPanel('Participantes', 'Verificando o acesso…');
@@ -190,6 +189,7 @@ async function start() {
         sessionPanel('Acesso pendente', 'Peça ao administrador para vincular sua conta a um participante.');
       } else if (page === 'perfil') {
         await openProfile(client);
+        if (main.querySelector("form")) await import("./temporada.js");
       } else {
         await openList(client);
       }
