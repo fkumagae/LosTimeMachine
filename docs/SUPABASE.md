@@ -1,0 +1,80 @@
+# Etapa 2 · Configuração e teste
+
+A aplicação abre os 19 perfis do Roster em modo TESTE local enquanto os dois campos de
+`js/supabase-config.js` estiverem vazios. `usertest1` a `usertest19` são identidades **simuladas**, sem conta real no Supabase. Com o Supabase configurado, a aba
+**Participantes** exige login e um vínculo ativo. Os fluxos da edição compartilhada exigem a segunda migração e o seed de edição descritos em [EDICAO.md](EDICAO.md).
+
+## Preparar um projeto de teste
+
+1. Crie ou selecione um projeto Supabase separado para o teste. No **SQL
+   Editor**, execute `supabase/migrations/20261115000100_collaborative_profiles.sql`
+   uma vez. Depois execute `supabase/seed.sql` para inserir **19 perfis** com UUIDs estáveis. O seed não cria usuários de autenticação, não sobrescreve os existentes e não apaga registros antigos.
+2. Em **Authentication → Sign In / Providers**, mantenha **Email** ativo e
+   desative **Allow new users to sign up** e o acesso anônimo.
+3. Em **Authentication → URL Configuration**, defina **Site URL** para a URL
+   exata da página de participantes que receberá o convite e os links de acesso.
+   Mantenha a mesma URL na lista de redirecionamentos permitidos. Para teste
+   local no computador, use `http://localhost:8000/pages/participantes.html`.
+   Para teste no telefone, use a URL HTTPS de uma prévia separada e autorizada.
+   Faça isso antes de enviar os convites.
+4. Em **Authentication → Email Templates**, mantenha os modelos padrão de
+   **Invite user** e **Magic link or OTP** para testar com links. Se você
+   configurar SMTP próprio e personalizar o modelo de acesso com
+   `{{ .Token }}`, o formulário também aceita o código.
+5. Para endereços fora da equipe da organização Supabase, configure SMTP próprio em
+   **Authentication → Custom SMTP**. As credenciais SMTP ficam no Supabase.
+   Para testes locais com Supabase CLI, consulte o capturador de e-mails
+   indicado por `supabase status`.
+6. Na cópia de teste do frontend, preencha `js/supabase-config.js` com a URL
+   do projeto e a chave **publishable** (`sb_publishable_…`). Chaves secretas,
+   credenciais SMTP e `service_role` devem ficar fora do frontend e do Git.
+   Com ambos os campos vazios o SDK não é carregado. No modo conectado, o SDK
+   tem versão fixada e é carregado do jsDelivr.
+
+Referências da configuração
+[Convites](https://supabase.com/docs/guides/auth/users),
+[modelos de e-mail](https://supabase.com/docs/guides/auth/auth-email-templates),
+[SMTP](https://supabase.com/docs/guides/auth/auth-smtp).
+
+## Convidar e vincular duas contas
+
+1. Em **Authentication → Users → Add user → Send invitation**, convide os
+   dois e-mails de teste. Copie o **UID** de cada conta.
+2. No **SQL Editor**, substitua os marcadores pelos UIDs copiados e execute:
+
+   ```sql
+   insert into public.participant_accounts (user_id, participant_id) values
+     ('<uid da primeira conta>', '00000000-0000-4000-8000-000000000001'), -- coach
+     ('<uid da segunda conta>', '00000000-0000-4000-8000-000000000002'); -- lako
+   ```
+
+3. Cada pessoa pode aceitar o convite pelo link. Para entrar novamente,
+   abra **Participantes**, solicite o acesso com o e-mail convidado e abra
+   o link recebido. Se o modelo enviar um código, selecione **Recebi um
+   código**. Uma conta sem vínculo vê **Acesso pendente**. Para
+   revogar o acesso aos perfis, remova o vínculo pelo painel administrativo
+   do Supabase.
+
+## Validar antes de publicar
+
+Sirva a branch no computador com `python3 -m http.server 8000` ou `py -m http.server 8000`.
+Use perfis separados do navegador ou aparelhos distintos para a matriz abaixo.
+No telefone, abra a cópia de teste por HTTPS para validar os links do
+convite e do login. Use a URL dessa cópia nas configurações de redirecionamento.
+
+| Teste | Resultado esperado |
+| --- | --- |
+| Visitante abre Participantes ou um link direto de perfil | Tela de entrada por convite |
+| Conta sem vínculo faz login | Acesso pendente e nenhuma lista de perfis |
+| Primeira conta altera a biografia de honesto | Perfil salvo |
+| Segunda conta atualiza a página de honesto | Biografia editada aparece |
+| Duas contas abrem o mesmo perfil, uma salva e a outra tenta salvar uma versão anterior | A segunda recebe aviso para atualizar a página |
+| Integrante tenta alterar ID de perfil ou vínculo pela API | Permissão negada |
+| Usuário sai e volta à lista | Tela de entrada por convite |
+| URL e chave publicável ficam vazias | Os 19 perfis e o seletor de `usertest1` a `usertest19` aparecem em teste local |
+
+## Antes de usar um Supabase já populado
+
+Se o seed anterior com Nina e Tico tiver sido aplicado, esses registros **continuarão no banco** depois de inserir os 19 perfis. Confira primeiro `participant_accounts` e vínculos existentes e planeje uma limpeza explícita, separada e revisada, se necessário. O modo local `usertestN` **não testa RLS nem login real**; para isso, use os convites por e-mail e os UIDs de Auth descritos acima.
+
+Para a lista oficial e seus UUIDs, consulte [ROSTER.md](ROSTER.md).

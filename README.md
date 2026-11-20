@@ -1,26 +1,27 @@
-# LosTimeMachine · Los Awards 2.0
+# Los Awards 2.0
 
-Protótipo local em HTML, CSS e JavaScript nativos. A edição, os participantes, as ilustrações e os votos da cerimônia são fictícios. O histórico de 2024 e 2025 aguarda dados verificados.
+Álbum colaborativo e premiação anual da turma. [Abrir o site](https://fkumagae.github.io/LosTimeMachine/).
 
-## Abrir a versão mais recente
+## Experimentar
 
-[**Abrir o protótipo no navegador**](https://fkumagae.github.io/LosTimeMachine/)
+1. Abra Galeria e guarde uma memória. Fotos podem marcar várias pessoas. Frases e histórias aceitam autoria e data opcional.
+2. Em Votação, indique fotos ou frases e escolha seus candidatos. Troque o integrante simulado para ensaiar com outra cédula.
+3. Em Administração, consulte as pendências e encerre a votação quando estiver pronto. No Histórico, passe as memórias da edição na TV. No Pódio, revele as categorias e o ranking final.
+4. No Hall da Lama, toque no total de troféus para ver anos e categorias. Cada perfil também tem uma estante.
 
-O endereço é fixo e acompanha a branch `main` após a ativação do GitHub Pages em **Settings → Pages → Deploy from a branch → main → / (root)**. A versão publicada contém dados demonstrativos.
+A configuração padrão usa **ensaio local**. Os 19 integrantes e as 58 referências de fotos vieram do Roster. Os votos e as novas memórias deste modo ficam no navegador usado. A edição compartilhada depende de Supabase configurado e contas vinculadas. O histórico de premiações antigas aguarda resultados confirmados.
 
-## Executar localmente
+## Desenvolvimento
 
-1. Extraia o ZIP e abra a pasta `losawards` no VS Code.
-2. No terminal dessa pasta, execute `python -m http.server 8000`. No Windows, se necessário, use `py -m http.server 8000`. Em macOS ou Linux, use `python3 -m http.server 8000`.
-3. Abra [http://localhost:8000](http://localhost:8000).
+Sirva a raiz com `python -m http.server 8000` e abra `http://localhost:8000`. Rode `node --test tests/*.cjs tests/*.mjs`. O frontend usa HTML, CSS e JS nativos com módulos. A publicação no Pages usa a raiz da main.
 
-## Roteiro de revisão
+| Componente | Responsabilidade |
+|---|---|
+| index.html, pages/, css/ | Navegação e apresentação |
+| js/data.js, js/app.js | Roster, home e renderização de perfis |
+| js/members.js, js/test-ui.js, js/test-users.js | Login, vínculos e edição de perfis |
+| js/temporada.js | Interface da galeria, votação, cerimônia, histórico e Hall |
+| js/edicao.mjs, js/ensaio.js | Regras e persistência transacional de ensaio |
+| supabase/, apps-script/ | Banco, permissões, API de edição e upload para o Drive |
 
-- Busque `antonio` em Participantes e abra o perfil de Tico.
-- Na Galeria, filtre por Duda e clique em **Adicionar foto** para ver o aviso.
-- No Histórico, alterne entre 2024 e 2025.
-- Na Votação, escolha uma categoria e simule uma escolha. A seleção é descartada ao recarregar.
-- No Pódio, revele três posições em **Melhor história**. Tico e Lume empatam em segundo. Avance para testar a categoria de fotos e a categoria sem votos.
-- Confira as ações futuras na Administração.
-
-As oito páginas ficam na raiz e em `pages/`, com estilos em `css/` e scripts em `js/`. Os dados DEMO ficam centralizados em `js/data.js` para dispensar duplicação em JSON e carregamento via fetch. As ilustrações locais ficam em `assets/`. A simulação roda no navegador e pode ser reiniciada recarregando a página.
+[Regras, operação e ativação da edição](docs/EDICAO.md) · [Configuração de perfis e convites](docs/SUPABASE.md) · [Roster oficial](docs/ROSTER.md) · [Importação histórica](docs/MIGRATION.md)
