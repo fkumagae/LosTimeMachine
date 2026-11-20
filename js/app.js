@@ -28,17 +28,17 @@ function watchImages() {
 
 function home() {
   main.innerHTML = `<section class="hero">
-    <div class="hero-copy"><span class="tag">EDIÇÃO ${demo.edition.ano} · DEMO</span>
+    <div class="hero-copy"><span class="tag">EDIÇÃO ${demo.edition.ano}</span>
     <h1>Los Awards<span>2.0</span></h1>
-    <p>Relembre os melhores momentos da turma e ensaie a grande revelação do pódio.</p>
-    <a class="button primary" href="pages/podio.html">Abrir pódio DEMO <span aria-hidden="true">→</span></a></div>
+    <p>Guarde as histórias da turma, relembre o ano e descubra os premiados.</p>
+    <a class="button primary" href="pages/podio.html">Abrir cerimônia <span aria-hidden="true">→</span></a></div>
     <div class="hero-art" aria-hidden="true"><span>✦</span><span>✧</span><span>✦</span><div class="trophy"><div></div><i></i><b></b></div></div>
   </section>
   <section class="shortcuts" aria-labelledby="explore"><h2 id="explore">Explore a edição</h2><div class="grid shortcuts-grid">
     ${[
       ['participantes', '●', 'Participantes', 'Conheça os perfis da turma.'],
       ['galeria', '▣', 'Galeria', 'Veja as memórias do grupo.'],
-      ['historico', '◷', 'Histórico', 'Consulte as edições de 2024 e 2025.'],
+      ['historico', '◷', 'Histórico', 'Reveja fotos e histórias por edição.'],
       ['podio', '✦', 'Pódio', 'Revele os colocados por categoria.']
     ].map(([slug, icon, title, copy]) => `<a class="card shortcut" href="pages/${slug}.html"><span class="shortcut-icon" aria-hidden="true">${icon}</span><h3>${title}</h3><p>${copy}</p><span class="arrow" aria-hidden="true">→</span></a>`).join('')}
   </div></section>`;
@@ -93,77 +93,8 @@ function profile(people = demo.participants, isDemo = true) {
   }
   main.innerHTML += `<div class="profile">${picture(profileImage(person.id), 'Foto de ' + person.apelido)}
     ${heading(person.apelido, person.nome, isDemo)}</div>
-    <h2>Fotos associadas</h2><div class="grid">${demo.photos.filter(photo => person.fotos.includes(photo.id)).map(photoCard).join('') || '<p class="empty">Nenhuma foto associada.</p>'}</div>
-    <div class="grid future"><div class="card panel"><h2>Conquistas</h2><p>Sem dados oficiais.</p></div><div class="card panel"><h2>Dívidas</h2><p>Regras a definir.</p></div></div>`;
+    `;
 }
 
-function gallery() {
-  main.innerHTML = heading('Galeria', 'Fotos vinculadas a participantes no Roster de 2024; upload ainda indisponível.', true) +
-    `<div class="toolbar"><label class="field">Participante<select id="photo-filter"><option value="">Todos</option>
-    ${demo.participants.map(person => `<option value="${person.id}">${esc(person.apelido)}</option>`).join('')}</select></label>
-    <button class="button primary" id="add-photo">Adicionar foto</button></div>
-    <div class="grid" id="photo-list" aria-live="polite"></div>
-    <dialog><form method="dialog"><h2>Disponível em breve</h2><p>O envio de fotos chega em uma etapa futura.</p><button class="button primary" autofocus>Fechar</button></form></dialog>`;
-  const filter = main.querySelector('select');
-  function update() {
-    main.querySelector('#photo-list').innerHTML = demo.photos.filter(photo =>
-      !filter.value || photo.participantes.includes(filter.value)
-    ).map(photoCard).join('') || '<p class="empty">Nenhuma foto para este participante.</p>';
-    watchImages();
-  }
-  filter.addEventListener('change', update);
-  main.querySelector('#add-photo').addEventListener('click', () => main.querySelector('dialog').showModal());
-  update();
-}
-
-function historyPage() {
-  main.innerHTML = heading('Histórico', 'Consulte o estado da importação das edições anteriores.') +
-    `<div class="toolbar"><label class="field">Edição<select id="year">${demo.historicalYears.map(year => `<option>${year}</option>`).join('')}</select></label>
-    <label class="field">Categoria<select disabled><option>Aguardando importação</option></select></label></div>
-    <div class="card panel"><h2>Aguardando importação</h2><p id="year-status" aria-live="polite"></p></div>
-    <div class="card panel future"><h2>Hall da Fama</h2><p>Disponível após a importação dos resultados verificados.</p></div>`;
-  const year = main.querySelector('#year');
-  function update() {
-    main.querySelector('#year-status').textContent = `Os resultados de ${year.value} ainda não foram importados.`;
-  }
-  year.addEventListener('change', update);
-  update();
-}
-
-function voting() {
-  main.innerHTML = heading('Votação', 'Experimente a seleção de candidatos. Nenhum voto será registrado.', true) +
-    `<label class="field">Categoria<select>${demo.categories.map(category => `<option value="${category.id}">${category.titulo}</option>`).join('')}</select></label>
-    <form><fieldset><legend>Escolha um candidato</legend><div id="choices" class="grid"></div></fieldset>
-    <button class="button primary" type="submit">Simular voto</button><p id="vote-status" role="status"></p></form>`;
-  const categorySelect = main.querySelector('select');
-  const status = main.querySelector('#vote-status');
-  const choices = main.querySelector('#choices');
-  function update() {
-    const category = demo.categories.find(item => item.id === categorySelect.value);
-    choices.innerHTML = nominees(category).map(candidate => `<label class="card choice">${picture(category.tipo === 'pessoa' ? profileImage(candidate.id) : candidate.imgs[0], '')}
-      <span><input required type="radio" name="candidate" value="${candidate.id}"> ${esc(candidate.apelido)}</span></label>`).join('');
-    status.textContent = '';
-    watchImages();
-  }
-  categorySelect.addEventListener('change', update);
-  choices.addEventListener('change', () => { status.textContent = ''; });
-  main.querySelector('form').addEventListener('submit', event => {
-    event.preventDefault();
-    status.textContent = 'Simulação concluída. Nenhum voto foi registrado.';
-  });
-  update();
-}
-
-function admin() {
-  main.innerHTML = heading('Administração', 'Prévia das ações disponíveis em etapas futuras.', true) +
-    '<div class="grid">' + [
-      ['Edições', 'Criar edições e definir datas.'],
-      ['Categorias', 'Configurar categorias e candidatos.'],
-      ['Participantes', 'Organizar os perfis da turma.'],
-      ['Fotos', 'Gerenciar as imagens da galeria.'],
-      ['Convites', 'Gerenciar o acesso por convite.']
-    ].map(([title, description]) => `<section class="card panel"><h2>${title}</h2><p>${description}</p><button class="button" disabled>Em breve</button></section>`).join('') + '</div>';
-}
-
-({ index: home, galeria: gallery, historico: historyPage, votacao: voting, admin })[page]?.();
+if (page === 'index') home();
 watchImages();

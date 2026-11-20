@@ -1,36 +1,27 @@
-# LosTimeMachine · Los Awards 2.0
+# Los Awards 2.0
 
-Protótipo em HTML, CSS e JavaScript nativos. **Nesta branch de teste, os 19 perfis e suas fotos vêm da aba Roster da planilha LosAwards 2024.** Os votos, o pódio e o histórico oficial não foram importados. A versão publicada na `main` permanece com dados fictícios.
+Álbum colaborativo e premiação anual da turma. [Abrir o site](https://fkumagae.github.io/LosTimeMachine/).
 
-## Abrir a versão mais recente
+## Experimentar
 
-[**Abrir o protótipo no navegador**](https://fkumagae.github.io/LosTimeMachine/)
+1. Abra Galeria e guarde uma memória. Fotos podem marcar várias pessoas. Frases e histórias aceitam autoria e data opcional.
+2. Em Votação, indique fotos ou frases e escolha seus candidatos. Troque o integrante simulado para ensaiar com outra cédula.
+3. Em Administração, consulte as pendências e encerre a votação quando estiver pronto. No Histórico, passe as memórias da edição na TV. No Pódio, revele as categorias e o ranking final.
+4. No Hall da Lama, toque no total de troféus para ver anos e categorias. Cada perfil também tem uma estante.
 
-O endereço é fixo e acompanha a branch `main` após a ativação do GitHub Pages em **Settings → Pages → Deploy from a branch → main → / (root)**. A versão publicada contém dados demonstrativos.
+A configuração padrão usa **ensaio local**. Os 19 integrantes e as 58 referências de fotos vieram do Roster. Os votos e as novas memórias deste modo ficam no navegador usado. A edição compartilhada depende de Supabase configurado e contas vinculadas. O histórico de premiações antigas aguarda resultados confirmados.
 
-## Executar localmente
+## Desenvolvimento
 
-1. Abra a pasta do repositório no VS Code.
-2. No terminal dessa pasta, execute `python -m http.server 8000`. No Windows, se necessário, use `py -m http.server 8000`. Em macOS ou Linux, use `python3 -m http.server 8000`.
-3. Abra [http://localhost:8000](http://localhost:8000).
+Sirva a raiz com `python -m http.server 8000` e abra `http://localhost:8000`. Rode `node --test tests/*.cjs tests/*.mjs`. O frontend usa HTML, CSS e JS nativos com módulos. A publicação no Pages usa a raiz da main.
 
-## Etapa 2 — contas e perfis colaborativos
+| Componente | Responsabilidade |
+|---|---|
+| index.html, pages/, css/ | Navegação e apresentação |
+| js/data.js, js/app.js | Roster, home e renderização de perfis |
+| js/members.js, js/test-ui.js, js/test-users.js | Login, vínculos e edição de perfis |
+| js/temporada.js | Interface da galeria, votação, cerimônia, histórico e Hall |
+| js/edicao.mjs, js/ensaio.js | Regras e persistência transacional de ensaio |
+| supabase/, apps-script/ | Banco, permissões, API de edição e upload para o Drive |
 
-Veja [Configuração e teste do Supabase](docs/SUPABASE.md) para preparar as migrações, a autenticação por convite e o teste com dois integrantes. A configuração padrão permite **teste local de edição com `usertest1` a `usertest19`**, sem criar usuários reais. Veja o [mapeamento de perfis e identidades](docs/ROSTER.md).
-
-## Roteiro de revisão
-
-- Busque `honesto` em Participantes, abra Thiago Davantel, selecione `usertest1` e edite a biografia; repita com `usertest2` no mesmo navegador.
-- Na Galeria, filtre por Bão e confira as fotos referenciadas na planilha. **Adicionar foto** continua indisponível.
-- No Histórico, alterne entre 2024 e 2025.
-- Na Votação, escolha uma categoria e simule uma escolha. A seleção é descartada ao recarregar.
-- No Pódio, confira que as categorias ainda não possuem votos e nenhum vencedor foi inventado.
-- Confira as ações futuras na Administração.
-
-As oito páginas ficam na raiz e em `pages/`, com estilos em `css/` e scripts em `js/`. Os perfis do Roster ficam em `js/data.js` e as identidades locais simuladas em `js/test-users.js` para dispensar duplicação em JSON e carregamento via fetch. As ilustrações locais ficam em `assets/`. A simulação roda no navegador e pode ser reiniciada recarregando a página.
-
-## Perfis e usuários de teste
-
-Esta branch `feat/roster-perfis-usertest` contém 19 perfis reais de referência, 58 URLs de imagem e navegação individual por integrante. `usertest1` até `usertest19` são **identidades locais simuladas** (sem e-mail, senha nem conta no Supabase). Nome, apelido e biografia podem ser alterados localmente e são guardados no `localStorage` do navegador; não há sincronização entre dispositivos. Para usar contas reais, siga o [guia Supabase](docs/SUPABASE.md): convide um e-mail e vincule o UID da conta a um perfil.
-
-O seed `supabase/seed.sql` cria os 19 perfis no banco de teste, **não cria contas** e não remove dados antigos de um projeto já populado. A versão publicada na `main` não foi alterada. Execute `node --test tests/roster.test.cjs` para verificar a estrutura dos dados.
+[Regras, operação e ativação da edição](docs/EDICAO.md) · [Configuração de perfis e convites](docs/SUPABASE.md) · [Roster oficial](docs/ROSTER.md) · [Importação histórica](docs/MIGRATION.md)

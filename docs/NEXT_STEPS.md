@@ -1,7 +1,9 @@
 # Próximas etapas
 
-1. **Etapa 2** — Contas por convite, vínculo entre conta e participante, perfis colaborativos e políticas de acesso no Supabase.
-2. **Etapa 3** — Upload via Apps Script para Drive, referências de imagens, moderação e fallback.
-3. **Etapa 4** — Importação auditável das edições 2024 e 2025, histórico e ranking oficial.
-4. **Etapa 5** — Votação real, encerramento, congelamento de resultados e cerimônia.
-5. **Etapa 6** — Sugestões de categorias, figurinhas e dívidas, após definição das regras.
+1. Conferir participantes e vínculos existentes no Supabase e reconciliar eventuais cadastros fictícios.
+2. Ativar e homologar a edição compartilhada com dois integrantes reais. Conferir login, revogação, alteração de voto e revelação no celular e na TV.
+3. Configurar a pasta do Drive e o Web App para upload. Validar as permissões das 58 referências antigas.
+4. Conferir as fontes de 2024 e 2025 antes de lançar prêmios antigos.
+5. Acrescentar a foto do Dadinho quando disponível. Regras de dívidas e figurinhas continuam em aberto.
+
+Veja [a operação da edição](EDICAO.md).

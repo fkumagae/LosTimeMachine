@@ -139,24 +139,6 @@ async function openProfile(client) {
     for (const key of ['nome', 'apelido', 'bio']) form.elements[key].value = profile[key];
   }
   display(person);
-  const photos = demo.photos.filter(photo => photo.participantes.includes(id));
-  if (photos.length) {
-    const gallery = document.createElement('div');
-    gallery.className = 'grid member-photos';
-    for (const photo of photos) {
-      const figure = document.createElement('figure');
-      figure.className = 'card photo-card';
-      const image = document.createElement('img');
-      image.src = photo.url;
-      image.alt = 'Foto de ' + person.apelido;
-      image.loading = 'lazy';
-      image.addEventListener('error', () => image.remove(), { once: true });
-      figure.append(image);
-      gallery.append(figure);
-    }
-    form.before(gallery);
-  }
-
   handleSubmit(form, async data => {
     const updates = Object.fromEntries(['nome', 'apelido', 'bio'].map(key => [key, data.get(key).trim()]));
     if (!updates.nome || !updates.apelido) {
@@ -179,6 +161,7 @@ async function openProfile(client) {
 async function start() {
   if (!url && !publishableKey) {
     openTestPage();
+    if (page === "perfil") await import("./temporada.js");
     return;
   }
   sessionPanel('Participantes', 'Verificando o acesso…');
@@ -206,6 +189,7 @@ async function start() {
         sessionPanel('Acesso pendente', 'Peça ao administrador para vincular sua conta a um participante.');
       } else if (page === 'perfil') {
         await openProfile(client);
+        if (main.querySelector("form")) await import("./temporada.js");
       } else {
         await openList(client);
       }

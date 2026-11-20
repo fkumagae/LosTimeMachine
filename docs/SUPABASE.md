@@ -2,8 +2,7 @@
 
 A aplicação abre os 19 perfis do Roster em modo TESTE local enquanto os dois campos de
 `js/supabase-config.js` estiverem vazios. `usertest1` a `usertest19` são identidades **simuladas**, sem conta real no Supabase. Com o Supabase configurado, a aba
-**Participantes** exige login e um vínculo ativo. Galeria, pódio e votação
-continuam usando seus dados de demonstração.
+**Participantes** exige login e um vínculo ativo. Os fluxos da edição compartilhada exigem a segunda migração e o seed de edição descritos em [EDICAO.md](EDICAO.md).
 
 ## Preparar um projeto de teste
 
