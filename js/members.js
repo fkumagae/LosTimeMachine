@@ -139,6 +139,23 @@ async function openProfile(client) {
     for (const key of ['nome', 'apelido', 'bio']) form.elements[key].value = profile[key];
   }
   display(person);
+  const photos = demo.photos.filter(photo => photo.participantes.includes(id));
+  if (photos.length) {
+    const gallery = document.createElement('div');
+    gallery.className = 'grid member-photos';
+    for (const photo of photos) {
+      const figure = document.createElement('figure');
+      figure.className = 'card photo-card';
+      const image = document.createElement('img');
+      image.src = photo.url;
+      image.alt = 'Foto de ' + person.apelido;
+      image.loading = 'lazy';
+      image.addEventListener('error', () => image.remove(), { once: true });
+      figure.append(image);
+      gallery.append(figure);
+    }
+    form.before(gallery);
+  }
 
   handleSubmit(form, async data => {
     const updates = Object.fromEntries(['nome', 'apelido', 'bio'].map(key => [key, data.get(key).trim()]));

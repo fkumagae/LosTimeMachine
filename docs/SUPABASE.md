@@ -1,7 +1,7 @@
 # Etapa 2 · Configuração e teste
 
-A aplicação abre a lista e os perfis em modo DEMO enquanto os dois campos de
-`js/supabase-config.js` estiverem vazios. Com o Supabase configurado, a aba
+A aplicação abre os 19 perfis do Roster em modo TESTE local enquanto os dois campos de
+`js/supabase-config.js` estiverem vazios. `usertest1` a `usertest19` são identidades **simuladas**, sem conta real no Supabase. Com o Supabase configurado, a aba
 **Participantes** exige login e um vínculo ativo. Galeria, pódio e votação
 continuam usando seus dados de demonstração.
 
@@ -9,8 +9,7 @@ continuam usando seus dados de demonstração.
 
 1. Crie ou selecione um projeto Supabase separado para o teste. No **SQL
    Editor**, execute `supabase/migrations/20261115000100_collaborative_profiles.sql`
-   uma vez. Depois execute `supabase/seed.sql` para criar dois participantes
-   fictícios. O seed não cria usuários.
+   uma vez. Depois execute `supabase/seed.sql` para inserir **19 perfis** com UUIDs estáveis. O seed não cria usuários de autenticação, não sobrescreve os existentes e não apaga registros antigos.
 2. Em **Authentication → Sign In / Providers**, mantenha **Email** ativo e
    desative **Allow new users to sign up** e o acesso anônimo.
 3. Em **Authentication → URL Configuration**, defina **Site URL** para a URL
@@ -46,8 +45,8 @@ Referências da configuração
 
    ```sql
    insert into public.participant_accounts (user_id, participant_id) values
-     ('<uid da primeira conta>', '11111111-1111-4111-8111-111111111111'),
-     ('<uid da segunda conta>', '22222222-2222-4222-8222-222222222222');
+     ('<uid da primeira conta>', '00000000-0000-4000-8000-000000000001'), -- coach
+     ('<uid da segunda conta>', '00000000-0000-4000-8000-000000000002'); -- lako
    ```
 
 3. Cada pessoa pode aceitar o convite pelo link. Para entrar novamente,
@@ -68,9 +67,15 @@ convite e do login. Use a URL dessa cópia nas configurações de redirecionamen
 | --- | --- |
 | Visitante abre Participantes ou um link direto de perfil | Tela de entrada por convite |
 | Conta sem vínculo faz login | Acesso pendente e nenhuma lista de perfis |
-| Primeira conta altera a biografia de Tico | Perfil salvo |
-| Segunda conta atualiza a página de Tico | Biografia editada aparece |
+| Primeira conta altera a biografia de honesto | Perfil salvo |
+| Segunda conta atualiza a página de honesto | Biografia editada aparece |
 | Duas contas abrem o mesmo perfil, uma salva e a outra tenta salvar uma versão anterior | A segunda recebe aviso para atualizar a página |
 | Integrante tenta alterar ID de perfil ou vínculo pela API | Permissão negada |
 | Usuário sai e volta à lista | Tela de entrada por convite |
-| URL e chave publicável ficam vazias | A lista e os perfis mostram o selo DEMO e dados fictícios |
+| URL e chave publicável ficam vazias | Os 19 perfis e o seletor de `usertest1` a `usertest19` aparecem em teste local |
+
+## Antes de usar um Supabase já populado
+
+Se o seed anterior com Nina e Tico tiver sido aplicado, esses registros **continuarão no banco** depois de inserir os 19 perfis. Confira primeiro `participant_accounts` e vínculos existentes e planeje uma limpeza explícita, separada e revisada, se necessário. O modo local `usertestN` **não testa RLS nem login real**; para isso, use os convites por e-mail e os UIDs de Auth descritos acima.
+
+Para a lista oficial e seus UUIDs, consulte [ROSTER.md](ROSTER.md).
