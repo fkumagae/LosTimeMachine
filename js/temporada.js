@@ -2,6 +2,7 @@ import { supabaseConfig } from './supabase-config.js';
 import { currentTestUser, selectTestUser, users } from './test-users.js';
 import { localSession } from './ensaio.js';
 import { trophies, credit } from './edicao.mjs';
+import { memoryLabel, resultLabel } from './rotulos.mjs';
 
 let state,
   client,
@@ -141,12 +142,6 @@ function galleryView() {
   );
 }
 
-function candidateLabel(cat, id) {
-  return cat.kind === 'pessoa'
-    ? nick(id)
-    : state.memories.find((m) => m.id === id)?.title || '';
-}
-
 function voteView() {
   const cat =
     state.categories.find((c) => c.id === categoryId) || state.categories[0];
@@ -160,7 +155,7 @@ function voteView() {
       '" ' +
       (state.ballot[cat.id] === id ? 'checked' : '') +
       '> ' +
-      esc(candidateLabel(cat, id)) +
+      esc(cat.kind === 'pessoa' ? nick(id) : memoryLabel(m, nick)) +
       '</label>'
     );
   });
@@ -199,7 +194,7 @@ function nomination(cat) {
           .map((m) =>
             option(
               m.id,
-              m.title +
+              memoryLabel(m, nick) +
                 (m.tags.length ? ' · ' + m.tags.map(nick).join(', ') : ''),
             ),
           )
@@ -262,7 +257,7 @@ function editionWinners(results) {
               (winner) =>
                 '<li>' +
                 (winner.image ? picture(winner.image, winner.label) : '') +
-                esc(winner.label) +
+                esc(resultLabel(winner, state.memories, nick)) +
                 '</li>',
             )
             .join('') +
@@ -405,7 +400,7 @@ function podiumView() {
                   .map(
                     (e) =>
                       (e.image ? picture(e.image, e.label) : '') +
-                      esc(e.label) +
+                      esc(resultLabel(e, state.memories, nick)) +
                       ' · ' +
                       e.count +
                       ' voto(s)',
