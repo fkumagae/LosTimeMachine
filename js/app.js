@@ -2,19 +2,20 @@
 
 const main = document.querySelector('main');
 const page = document.body.dataset.page;
-const asset = name => '../assets/' + name + '.jpg';
+const profileImage = id => demo.photos.find(photo => photo.participantes.includes(id))?.url || '';
+const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const normalize = text => text.normalize('NFD').replace(/\p{M}/gu, '').trim().replace(/\s+/g, ' ').toLowerCase();
 
 function heading(title, description, demoLabel = false) {
-  return `<div class="heading">${demoLabel ? '<span class="tag">DEMO</span>' : ''}<h1>${title}</h1><p>${description}</p></div>`;
+  return `<div class="heading">${demoLabel ? '<span class="tag">DEMO</span>' : ''}<h1>${esc(title)}</h1><p>${esc(description)}</p></div>`;
 }
 
 function picture(url, alt, classes = '') {
-  return `<div class="picture ${classes}"><span aria-hidden="true">Sem imagem</span>${url ? `<img src="${url}" alt="${alt}">` : ''}</div>`;
+  return `<div class="picture ${classes}"><span aria-hidden="true">Sem imagem</span>${url ? `<img src="${esc(url)}" alt="${esc(alt)}">` : ''}</div>`;
 }
 
 function photoCard(photo) {
-  return `<figure class="card photo-card">${picture(photo.url, photo.legenda)}<figcaption>${photo.legenda}</figcaption></figure>`;
+  return `<figure class="card photo-card">${picture(photo.url, photo.legenda)}<figcaption>${esc(photo.legenda)}</figcaption></figure>`;
 }
 
 function watchImages() {
@@ -45,9 +46,19 @@ function home() {
 
 function participants(people = demo.participants, isDemo = true) {
   main.innerHTML = heading('Participantes', 'Encontre um integrante pelo nome ou apelido.', isDemo) +
-    '<label class="field">Buscar participante<input type="search" placeholder="Ex.: Tico"></label><div id="people" class="grid" aria-live="polite"></div>';
+    '<label class="field">Buscar participante<input type="search" placeholder="Ex.: honesto ou Thiago"></label><div id="people" class="grid" aria-live="polite"></div>';
   const search = main.querySelector('input');
   const list = main.querySelector('#people');
+  const tabs = document.createElement('nav');
+  tabs.className = 'member-tabs';
+  tabs.setAttribute('aria-label', 'Abas individuais dos integrantes');
+  for (const person of people) {
+    const link = document.createElement('a');
+    link.href = 'perfil.html?id=' + encodeURIComponent(person.id);
+    link.textContent = person.apelido;
+    tabs.append(link);
+  }
+  main.querySelector('.field').after(tabs);
   function filter() {
     const query = normalize(search.value);
     const matches = people.filter(person =>
@@ -61,7 +72,7 @@ function participants(people = demo.participants, isDemo = true) {
       const link = document.createElement('a');
       link.className = 'card person';
       link.href = 'perfil.html?id=' + encodeURIComponent(person.id);
-      link.innerHTML = picture(isDemo ? asset(person.id) : '', 'Retrato ilustrativo de ' + person.apelido)
+      link.innerHTML = picture(profileImage(person.id), 'Foto de ' + person.apelido)
         + '<div><h2></h2><p></p></div>';
       link.querySelector('h2').textContent = person.apelido;
       link.querySelector('p').textContent = person.nome;
@@ -73,23 +84,23 @@ function participants(people = demo.participants, isDemo = true) {
   filter();
 }
 
-function profile() {
-  const person = demo.participants.find(item => item.id === new URLSearchParams(location.search).get('id'));
+function profile(people = demo.participants, isDemo = true) {
+  const person = people.find(item => item.id === new URLSearchParams(location.search).get('id'));
   main.innerHTML = '<a class="back" href="participantes.html">← Participantes</a>';
   if (!person) {
     main.innerHTML += heading('Perfil indisponível', 'Selecione um participante na lista para abrir um perfil.');
     return;
   }
-  main.innerHTML += `<div class="profile">${picture(asset(person.id), 'Retrato ilustrativo de ' + person.apelido)}
-    ${heading(person.apelido, person.nome, true)}</div>
+  main.innerHTML += `<div class="profile">${picture(profileImage(person.id), 'Foto de ' + person.apelido)}
+    ${heading(person.apelido, person.nome, isDemo)}</div>
     <h2>Fotos associadas</h2><div class="grid">${demo.photos.filter(photo => person.fotos.includes(photo.id)).map(photoCard).join('') || '<p class="empty">Nenhuma foto associada.</p>'}</div>
-    <div class="grid future"><div class="card panel"><h2>Conquistas</h2><p>Em breve.</p></div><div class="card panel"><h2>Dívidas</h2><p>Em breve.</p></div></div>`;
+    <div class="grid future"><div class="card panel"><h2>Conquistas</h2><p>Sem dados oficiais.</p></div><div class="card panel"><h2>Dívidas</h2><p>Regras a definir.</p></div></div>`;
 }
 
 function gallery() {
-  main.innerHTML = heading('Galeria', 'Memórias ilustrativas da edição demonstrativa.', true) +
+  main.innerHTML = heading('Galeria', 'Fotos vinculadas a participantes no Roster de 2024; upload ainda indisponível.', true) +
     `<div class="toolbar"><label class="field">Participante<select id="photo-filter"><option value="">Todos</option>
-    ${demo.participants.map(person => `<option value="${person.id}">${person.apelido}</option>`).join('')}</select></label>
+    ${demo.participants.map(person => `<option value="${person.id}">${esc(person.apelido)}</option>`).join('')}</select></label>
     <button class="button primary" id="add-photo">Adicionar foto</button></div>
     <div class="grid" id="photo-list" aria-live="polite"></div>
     <dialog><form method="dialog"><h2>Disponível em breve</h2><p>O envio de fotos chega em uma etapa futura.</p><button class="button primary" autofocus>Fechar</button></form></dialog>`;
@@ -129,8 +140,8 @@ function voting() {
   const choices = main.querySelector('#choices');
   function update() {
     const category = demo.categories.find(item => item.id === categorySelect.value);
-    choices.innerHTML = nominees(category).map(candidate => `<label class="card choice">${picture(category.tipo === 'pessoa' ? asset(candidate.id) : candidate.imgs[0], '')}
-      <span><input required type="radio" name="candidate" value="${candidate.id}"> ${candidate.apelido}</span></label>`).join('');
+    choices.innerHTML = nominees(category).map(candidate => `<label class="card choice">${picture(category.tipo === 'pessoa' ? profileImage(candidate.id) : candidate.imgs[0], '')}
+      <span><input required type="radio" name="candidate" value="${candidate.id}"> ${esc(candidate.apelido)}</span></label>`).join('');
     status.textContent = '';
     watchImages();
   }

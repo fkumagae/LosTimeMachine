@@ -1,4 +1,5 @@
 import { supabaseConfig } from './supabase-config.js';
+import { openTestPage } from './test-ui.js';
 
 const { url, publishableKey } = supabaseConfig;
 const fields = 'id,nome,apelido,bio,updated_at';
@@ -160,9 +161,7 @@ async function openProfile(client) {
 
 async function start() {
   if (!url && !publishableKey) {
-    if (page === 'perfil') profile();
-    else participants();
-    watchImages();
+    openTestPage();
     return;
   }
   sessionPanel('Participantes', 'Verificando o acesso…');
