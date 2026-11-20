@@ -31,7 +31,8 @@ async function transact(change) {
         }
       }
     };
-    tx.oncomplete = () => resolve(state);
+    // A gravação apenas confirma o commit. A interface relê sua visão da edição.
+    tx.oncomplete = () => resolve(change ? undefined : state);
     tx.onabort = () => reject(tx.error || Error('Alteração cancelada.'));
     tx.onerror = () => reject(tx.error);
   });
@@ -52,8 +53,12 @@ export async function localSession() {
     me,
     admin: true,
     local: true,
-    ...state,
-    votes: undefined,
+    year: state.year,
+    phase: state.phase,
+    categories: state.categories,
+    memories: state.memories,
+    archive: state.archive,
+    revealed: state.revealed,
     results: state.results.slice(0, state.revealed),
     ballot: state.votes[me] || {},
     done,
